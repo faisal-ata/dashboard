@@ -7,7 +7,16 @@ document.getElementById('uploadForm').addEventListener('submit', function(e) {
         return;
     }
 
-    // For now, we'll just show the file name as an example
-    document.getElementById('result').innerText = 'File uploaded: ' + fileInput.name;
-});
+    let reader = new FileReader();
+    reader.onload = function(event) {
+        let data = new Uint8Array(event.target.result);
+        let workbook = XLSX.read(data, { type: 'array' });
+        let sheetName = workbook.SheetNames[0];  // Get the first sheet
+        let sheet = workbook.Sheets[sheetName];
+        let jsonData = XLSX.utils.sheet_to_json(sheet);
 
+        // Display the JSON data (you can customize this)
+        document.getElementById('result').innerText = JSON.stringify(jsonData, null, 2);
+    };
+    reader.readAsArrayBuffer(fileInput);
+});
